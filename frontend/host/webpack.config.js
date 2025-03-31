@@ -57,6 +57,18 @@ module.exports = (_, argv) => ({
           loader: "babel-loader",
         },
       },
+      {
+        test: /\.(svg)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: "[path][name].[ext]",
+              emitFile: true,
+            },
+          },
+        ],
+      },
     ],
   },
 

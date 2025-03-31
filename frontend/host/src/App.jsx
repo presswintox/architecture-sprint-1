@@ -1,6 +1,8 @@
-import React, {lazy} from "react";
-import { Route, useHistory, Switch, BrowserRouter  } from "react-router-dom";
+import React, {lazy, Suspense } from "react";
+import { Route, useHistory, Switch, BrowserRouter} from "react-router-dom";
 import Footer from "./components/Footer";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Header from "./components/Header";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 
@@ -9,22 +11,57 @@ const Register = lazy(() => import('auth/Register').catch(() => {
  })
 );
 
+const Login = lazy(() => import('auth/Login').catch(() => {
+  return { default: () => <div className='error'>Component is not available!</div> };
+ })
+);
+
+
 const App = () => {
+  const history = useHistory();
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+  const [email, setEmail] = React.useState("");
+  function onSignOut() {
+    // при вызове обработчика onSignOut происходит удаление jwt
+    localStorage.removeItem("jwt");
+    setIsLoggedIn(false);
+    // После успешного вызова обработчика onSignOut происходит редирект на /signin
+    history.push("/signin");
+  }
 
   return (
         // В компонент App внедрён контекст через CurrentUserContext.Provider
     // <CurrentUserContext.Provider value={currentUser}>
     <React.StrictMode>
+      <Suspense fallback={<div>Loading...</div>}>
       <BrowserRouter>
         <div className="page__content">
-          <Switch>
-            <Route path="/signup">
-              <Register />
-            </Route>
-          </Switch>
+          <Header email={email} onSignOut={onSignOut} />
+            <Switch>
+              <ProtectedRoute
+                exact
+                path="/"
+                component={Register}
+                // cards={cards}
+                // onEditProfile={handleEditProfileClick}
+                // onAddPlace={handleAddPlaceClick}
+                // onEditAvatar={handleEditAvatarClick}
+                // onCardClick={handleCardClick}
+                // onCardLike={handleCardLike}
+                // onCardDelete={handleCardDelete}
+                // loggedIn={isLoggedIn}
+              />
+              <Route path="/signup">
+                <Register />
+              </Route>
+              <Route path="/signin">
+                <Login />
+              </Route>
+            </Switch>
           <Footer />
         </div>
       </BrowserRouter>
+      </Suspense>
     </React.StrictMode>
     //     <Header email={email} onSignOut={onSignOut} />
     //     <Switch>
