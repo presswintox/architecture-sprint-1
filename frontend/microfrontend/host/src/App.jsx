@@ -33,6 +33,10 @@ const CurrentUserProvider = lazy(() => import('user/CurrentUserProvider').catch(
   return { default: () => <div className='error'>Component is not available!</div> };
  })
 );
+const InfoTooltip = lazy(() => import('auth/InfoTooltip').catch(() => {
+  return { default: () => <div className='error'>Component is not available!</div> };
+ }
+));
 
 
 function App (){
@@ -81,6 +85,7 @@ function App (){
             </Route>
           </Switch>
           <AddPlacePopup/>
+          <InfoTooltip />
         <Footer />
       </div>
 

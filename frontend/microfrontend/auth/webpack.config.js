@@ -57,6 +57,18 @@ module.exports = (_, argv) => ({
           loader: "babel-loader",
         },
       },
+      {
+        test: /\.(svg)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: "[path][name].[ext]",
+              emitFile: true,
+            },
+          },
+        ],
+      },
     ],
   },
 
@@ -70,6 +82,7 @@ module.exports = (_, argv) => ({
         "./Login": "./src/components/Login.js",
         "./ProtectedRoute": "./src/components/ProtectedRoute.js",
         './api': './src/utils/api.js', 
+        './InfoTooltip': './src/components/InfoTooltip.js',
       },
       shared: {
         ...deps,

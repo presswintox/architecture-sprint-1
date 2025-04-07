@@ -1,25 +1,32 @@
 import React from 'react';
-import { Link, history } from 'react-router-dom';
+import { Link, useHistory} from 'react-router-dom';
 import api from '../utils/api';
 import '../blocks/auth-form/auth-form.css'
 
 function Register (){
+
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+
+  const history = useHistory();
   function onRegister({ email, password }) {
     api
       .register(email, password)
       .then((res) => {
-        setTooltipStatus("success");
-        setIsInfoToolTipOpen(true);
-        history.push("/signin");
+          console.log(res);
+          console.log('Event send success registration');
+          dispatchEvent(new CustomEvent("open-info-tooltip",{
+            detail: "success",
+          }));
+          history.push("/signin");
       })
       .catch((err) => {
-        setTooltipStatus("fail");
-        setIsInfoToolTipOpen(true);
+        console.log('Event send fail registration');
+        dispatchEvent(new CustomEvent("open-info-tooltip",{
+          detail: "fail",
+        }));
       });
   }
-
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
 
   function handleSubmit(e){
     e.preventDefault();

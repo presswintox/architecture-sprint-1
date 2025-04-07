@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import api from '../utils/api';
 import '../blocks/login/login.css';
 import '../blocks/auth-form/auth-form.css';
+
 function Login (){
   const history = useHistory();
   const [email, setEmail] = React.useState('');
@@ -15,8 +16,10 @@ function Login (){
         history.push("/");
       })
       .catch((err) => {
-        // setTooltipStatus("fail");
-        // setIsInfoToolTipOpen(true);
+        console.log('Event send fail login');
+        dispatchEvent(new CustomEvent("open-info-tooltip",{
+          detail: "fail",
+        }));
       });
 
   }
