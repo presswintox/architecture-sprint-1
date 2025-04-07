@@ -1,10 +1,13 @@
 import React, {lazy, Suspense } from "react";
 import { Route, useHistory, Switch, BrowserRouter} from "react-router-dom";
 import Footer from "./components/Footer";
-import ProtectedRoute from "./components/ProtectedRoute";
 import Header from "./components/Header";
 import ReactDOM from "react-dom/client";
 import "./index.css";
+import Main from "./components/Main";
+import api from 'auth/api';
+// import CurrentUserProvider from 'user/CurrentUserProvider';
+import CurrentUserContext from 'user/CurrentUserContext';
 
 const Register = lazy(() => import('auth/Register').catch(() => {
   return { default: () => <div className='error'>Component is not available!</div> };
@@ -16,53 +19,71 @@ const Login = lazy(() => import('auth/Login').catch(() => {
  })
 );
 
+const AddPlacePopup = lazy(() => import('card/AddPlacePopup').catch(() => {
+  return { default: () => <div className='error'>Compon12312312xavailable!</div> };
+ }
+));
 
-const App = () => {
+const ProtectedRoute = lazy(() => import('auth/ProtectedRoute').catch(() => {
+  return { default: () => <div className='error'>Component is not available!</div> };
+ })
+);
+
+const CurrentUserProvider = lazy(() => import('user/CurrentUserProvider').catch(() => {
+  return { default: () => <div className='error'>Component is not available!</div> };
+ })
+);
+
+
+function App (){
   const history = useHistory();
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-  const [email, setEmail] = React.useState("");
+  const currentUser = React.useContext(CurrentUserContext);
+
+  React.useEffect(() => {
+    const token = localStorage.getItem("jwt");
+    if (token) {
+      api
+        .checkToken(token)
+        .then((res) => {
+          // setEmail(res.data.email);
+          setIsLoggedIn(true);
+          history.push("/");
+        })
+        .catch((err) => {
+          localStorage.removeItem("jwt");
+          console.log(err);
+        });
+    }
+  }, [history]);
+
   function onSignOut() {
-    // при вызове обработчика onSignOut происходит удаление jwt
     localStorage.removeItem("jwt");
     setIsLoggedIn(false);
-    // После успешного вызова обработчика onSignOut происходит редирект на /signin
-    history.push("/signin");
+    history.push("/signup");
   }
 
   return (
-        // В компонент App внедрён контекст через CurrentUserContext.Provider
-    // <CurrentUserContext.Provider value={currentUser}>
-    <React.StrictMode>
-      <Suspense fallback={<div>Loading...</div>}>
-      <BrowserRouter>
-        <div className="page__content">
-          <Header email={email} onSignOut={onSignOut} />
-            <Switch>
-              <ProtectedRoute
-                exact
-                path="/"
-                component={Register}
-                // cards={cards}
-                // onEditProfile={handleEditProfileClick}
-                // onAddPlace={handleAddPlaceClick}
-                // onEditAvatar={handleEditAvatarClick}
-                // onCardClick={handleCardClick}
-                // onCardLike={handleCardLike}
-                // onCardDelete={handleCardDelete}
-                // loggedIn={isLoggedIn}
-              />
-              <Route path="/signup">
-                <Register />
-              </Route>
-              <Route path="/signin">
-                <Login />
-              </Route>
-            </Switch>
-          <Footer />
-        </div>
-      </BrowserRouter>
-      </Suspense>
-    </React.StrictMode>
+      <div className="page__content">
+        <Header email={currentUser.email} onSignOut={onSignOut} />
+          <Switch>
+            <ProtectedRoute
+              exact
+              path="/"
+              component={Main}
+              isLoggedIn={isLoggedIn}
+            />
+            <Route path="/signup">
+              <Register />
+            </Route>
+            <Route path="/signin">
+              <Login />
+            </Route>
+          </Switch>
+          <AddPlacePopup/>
+        <Footer />
+      </div>
+
     //     <Header email={email} onSignOut={onSignOut} />
     //     <Switch>
     //       <ProtectedRoute
@@ -115,4 +136,14 @@ if (!rootElement) throw new Error("Failed to find the root element")
 
 const root = ReactDOM.createRoot(rootElement)
 
-root.render(<App />)
+root.render(
+  <React.StrictMode>
+    <Suspense fallback={<div>Loading...</div>}>
+      <BrowserRouter>
+        <CurrentUserProvider>
+          <App />
+        </CurrentUserProvider>
+      </BrowserRouter>
+    </Suspense>
+  </React.StrictMode>
+)

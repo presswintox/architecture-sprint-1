@@ -47,9 +47,6 @@ class Api {
 }
 }
 
-const api = new Api({
-  //address: 'http://localhost:3001',
-  address: 'https://nomoreparties.co',
-});
+const api = new Api({});
 
 export default api;

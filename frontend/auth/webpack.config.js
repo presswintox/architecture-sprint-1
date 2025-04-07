@@ -67,7 +67,9 @@ module.exports = (_, argv) => ({
       remotes: {},
       exposes: {
         "./Register": "./src/components/Register.js",
-        "./Login": "./src/components/Login.js"
+        "./Login": "./src/components/Login.js",
+        "./ProtectedRoute": "./src/components/ProtectedRoute.js",
+        './api': './src/utils/api.js', 
       },
       shared: {
         ...deps,

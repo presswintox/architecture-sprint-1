@@ -1,9 +1,10 @@
 import React from 'react';
-import { history } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import api from '../utils/api';
 import '../blocks/login/login.css';
 import '../blocks/auth-form/auth-form.css';
 function Login (){
+  const history = useHistory();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
 
@@ -11,14 +12,13 @@ function Login (){
     api
       .login(email, password)
       .then((res) => {
-        setIsLoggedIn(true);
-        setEmail(email);
         history.push("/");
       })
       .catch((err) => {
-        setTooltipStatus("fail");
-        setIsInfoToolTipOpen(true);
+        // setTooltipStatus("fail");
+        // setIsInfoToolTipOpen(true);
       });
+
   }
 
   function handleSubmit(e){
